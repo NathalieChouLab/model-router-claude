@@ -1,7 +1,7 @@
 # Router playbook — details on demand
 
 ## Effort mechanics (what the keywords actually do)
-Each agent file in ~/.claude/agents/ carries `effort:` (set by the installed profile; values low/medium/high/xhigh/max), so effort changes automatically whenever the router changes tier. The only thinking keyword current Claude Code still recognises is the literal `ultrathink`, which jumps that one request to maximum; "think", "think hard" and "think harder" are plain words now. Use it only where reasoning is the bottleneck; on lookup or transcription work it adds latency and burns budget for identical output. The main session's own effort comes from settings.json (`effortLevel`, or per-model under `modelSettings`) and only the user can change it mid-session with /effort or /model. MAX_THINKING_TOKENS caps everything; leave it unset unless costs demand a ceiling.
+Each agent file in ~/.claude/agents/ carries `effort:` (set by the installed profile; values low/medium/high/xhigh/max), so effort changes automatically whenever the router changes tier. To raise it for one part, pass the Agent tool's per-call `effort` parameter, which overrides the frontmatter. Do it only where reasoning is the bottleneck; on lookup or transcription work it adds latency and burns budget for identical output. Thinking keywords are not a lever for subagents: Claude Code documents `ultrathink` only for the user's own prompt, and "think" / "think hard" are ordinary text. The main session's own effort comes from settings.json (`effortLevel`, or per-model under `modelSettings`) and only the user can change it mid-session with /effort or /model. MAX_THINKING_TOKENS caps everything; leave it unset unless costs demand a ceiling.
 
 ## Checkpoint re-routing (the switch-back-and-forth rule)
 The tier is decided per part and re-decided at every checkpoint (plan approved, agent returned, verdict in, new fact, user changed the ask). Down-shifts are free and expected: architect plans, builder types, scout greps, verifier checks, and the top model is idle in between. Up-shifts need evidence, but under the quality-first setting one failed verification is enough: retry builder with the failure spelled out in the brief only for a contained slip, otherwise the part goes to architect, and blast-radius discovery jumps straight to architect + human stop. An escalation applies to the part that earned it, not to the rest of the task — once the retry passes, the next part resumes its natural tier. Log each switch as a one-line `Re-route: a → b (reason)`.
@@ -17,7 +17,7 @@ GOAL: one sentence. CONSTRAINTS: the non-negotiables (platform facts, style rule
 
 ## Anti-patterns (each has burned real budget)
 1. Architect used as a typist — top model implementing a settled plan.
-2. Effort as reassurance — "ultrathink" on everything "to be safe". Escalation loses meaning and quota drains.
+2. Effort as reassurance — raised effort on everything "to be safe". Escalation loses meaning and quota drains.
 3. Verifier = author — self-review passes ~everything; the whole point is adversarial distance.
 4. Scout dumping files — if a scout returns file contents instead of conclusions, the context saving is gone; tighten the brief.
 5. Silent downgrade inside a part — finishing a hard part on a cheaper tier because it "looked almost done"; the cliff appears exactly at the hard bit. (Down-shifting *between* parts is the router working as intended.)
