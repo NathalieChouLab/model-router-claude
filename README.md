@@ -14,6 +14,7 @@ Claude Code cannot change its own session model mid-task (`/model` and `/effort`
 | `tester` | opus | high | writes and runs the tests from the brief, independently of the builder |
 | `writer` | opus | medium | prose from an approved outline: README, docs, changelog, UI and marketing copy |
 | `verifier` | opus | high | adversarial, read-only review of someone else's change; `PASS`/`FAIL` with evidence |
+| `planner` | opus | high | read-only: investigates and plans reversible work (blast radius 0–1) so the architect is kept for what is expensive to get wrong |
 | `architect` | fable | high | plans and decisions; anything with blast radius 2 (billing, auth, data, deploy) |
 | `auditor` | fable | max | read-only final gate for blast radius 2: `SHIP` / `DO NOT SHIP`, with rollback check |
 | `designer` | opus | high | read-only UI/visual review against a written standard; renders the page, returns a fix list |
@@ -52,30 +53,34 @@ This copies `skills/model-router/` to `~/.claude/skills/` and the eighteen agent
 PROFILE=quality ./install.sh   # default — Max, Team Premium, Enterprise, API
 PROFILE=pro ./install.sh       # Claude Pro
 PROFILE=cost ./install.sh      # usage-first on any plan
+PROFILE=fable-lean ./install.sh # Fable-quality outcomes for the fewest Fable tokens
 ```
 
-| Agent | quality | pro | cost |
-|---|---|---|---|
-| scout | sonnet · low | haiku · low | haiku · low |
-| researcher | sonnet · medium | sonnet · medium | haiku · medium |
-| builder | opus · high | sonnet · high | sonnet · medium |
-| tester | opus · high | sonnet · high | sonnet · medium |
-| writer | opus · medium | sonnet · medium | sonnet · low |
-| verifier | opus · high | sonnet · high | sonnet · medium |
-| architect | fable · high | opus · high | opus · high |
-| auditor | fable · max | opus · xhigh | opus · high |
-| designer | opus · high | sonnet · high | sonnet · medium |
-| debugger | opus · high | opus · high | sonnet · high |
-| analyst | opus · high | sonnet · high | sonnet · medium |
-| librarian | sonnet · medium | sonnet · medium | haiku · medium |
-| coordinator | opus · high | opus · high | sonnet · high |
-| promptsmith | fable · high | opus · high | opus · high |
-| editor | opus · medium | sonnet · medium | sonnet · low |
-| counsel | fable · high | opus · high | opus · high |
-| operator | opus · high | sonnet · high | sonnet · high |
-| monitor | haiku · low | haiku · low | haiku · low |
+| Agent | quality | pro | cost | fable-lean |
+|---|---|---|---|---|
+| scout | sonnet · low | haiku · low | haiku · low | haiku · low |
+| researcher | sonnet · medium | sonnet · medium | haiku · medium | sonnet · medium |
+| builder | opus · high | sonnet · high | sonnet · medium | sonnet · medium |
+| tester | opus · high | sonnet · high | sonnet · medium | sonnet · medium |
+| writer | opus · medium | sonnet · medium | sonnet · low | sonnet · medium |
+| verifier | opus · high | sonnet · high | sonnet · medium | opus · medium |
+| architect | fable · high | opus · high | opus · high | fable · low |
+| auditor | fable · max | opus · xhigh | opus · high | fable · high |
+| designer | opus · high | sonnet · high | sonnet · medium | opus · medium |
+| debugger | opus · high | opus · high | sonnet · high | opus · high |
+| analyst | opus · high | sonnet · high | sonnet · medium | sonnet · medium |
+| librarian | sonnet · medium | sonnet · medium | haiku · medium | sonnet · medium |
+| coordinator | opus · high | opus · high | sonnet · high | opus · medium |
+| promptsmith | fable · high | opus · high | opus · high | fable · low |
+| editor | opus · medium | sonnet · medium | sonnet · low | opus · medium |
+| counsel | fable · high | opus · high | opus · high | fable · low |
+| operator | opus · high | sonnet · high | sonnet · high | opus · medium |
+| monitor | haiku · low | haiku · low | haiku · low | haiku · low |
+| planner | opus · high | opus · high | sonnet · high | opus · medium |
 
 **Why the `pro` profile looks like this.** On Claude Pro the session default is Sonnet, Opus draws on the same 5-hour usage window, and Fable can bill to usage credits rather than the plan's included limits (see [Claude Code model configuration](https://code.claude.com/docs/en/model-config)). So `pro` keeps the mechanical tiers on Sonnet at high effort, which is where most tokens go, and spends Opus only on the two tiers where judgment is expensive to get wrong: `architect` and `auditor`. The routing rules are identical; only the pins change. If you later buy usage credits or move to Max, re-run with `PROFILE=quality`.
+
+**Why the `fable-lean` profile looks like this.** It treats Fable as the scarce allowance. Sonnet makes (builder, tester, writer, analyst), Opus plans and checks (planner, debugger, verifier, editor, designer), and Fable is spent only on blast radius 2: architect, auditor, promptsmith, counsel. Every maker sits one rung below its checker, and effort stays at medium except where a wrong answer costs a full loop (debugger, auditor). With this profile, send investigate-and-plan work at blast radius 0–1 to `planner` and escalate one rung at a time: Haiku → Sonnet → Opus → Fable.
 
 The tables live in `profiles/*.tsv` (agent, model, effort per line) — edit or add your own and install with `PROFILE=<name>`.
 

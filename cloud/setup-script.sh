@@ -4,7 +4,7 @@
 # desktop, `claude --cloud`) routes work across the pinned agents, with no per-repo commits.
 # Paste into claude.ai/code -> environment settings -> Setup script. Runs once per environment,
 # then the filesystem snapshot is cached for about seven days.
-# Profile: set MODEL_ROUTER_PROFILE=quality|pro|cost in the environment variables (default quality).
+# Profile: set MODEL_ROUTER_PROFILE=quality|pro|cost|fable-lean in the environment variables (default quality).
 RAW="https://raw.githubusercontent.com/NathalieChouLab/model-router-claude/main"
 PROFILE="${MODEL_ROUTER_PROFILE:-quality}"
 

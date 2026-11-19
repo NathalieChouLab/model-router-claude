@@ -43,6 +43,7 @@ Most real tasks are mixed. Split them so each part runs at its own tier:
 
 ```
 investigate + plan      → ARCHITECT   (stop, present plan, wait if blast radius ≥ 1)
+plan reversible work    → PLANNER     (blast radius 0–1; promotes to architect if it finds billing/auth/data)
 external facts / docs   → RESEARCHER  (library APIs, versions, platform behaviour; sourced)
 find/grep/summarize     → SCOUT       (run in parallel, results only, keeps main context clean)
 write the tests         → TESTER      (from the brief, not the implementation; before or beside the builder)
@@ -78,6 +79,7 @@ and each pins its model):
 - `tester` — Opus at high effort, writes and runs tests independently of the builder
 - `writer` — Opus at medium effort, prose from an approved outline
 - `verifier` — Opus, read-only, adversarial
+- `planner` — Opus, read-only, plans reversible work (blast radius 0–1)
 - `architect` — Fable 5.2, plans and decisions
 - `auditor` — Fable 5.2 at maximum effort, read-only final gate for blast radius 2
 - `designer` — Opus, read-only visual/UX review against a standard
@@ -106,6 +108,7 @@ switches effort automatically:
 | `tester` | opus | high | "think harder" for concurrency or security test cases |
 | `writer` | opus | medium | "think hard" for positioning-sensitive copy |
 | `verifier` | opus | high | "think harder" when the change is subtle |
+| `planner` | opus | high | "think harder" when the code is unfamiliar |
 | `architect` | fable | high | "ultrathink" for irreversible / unknown-cause work |
 | `auditor` | fable | max | already at maximum — never bump; split the change instead |
 | `designer` | opus | high | "think hard" when the standard is thin |
@@ -125,7 +128,9 @@ switches effort automatically:
 
 The table is the `quality` profile. On Claude Pro install with `PROFILE=pro`
 (Sonnet for the mechanical tiers, Opus for architect and auditor); the routing
-rules below do not change, only the pins.
+rules below do not change, only the pins. With `PROFILE=fable-lean` (Fable is
+the scarce allowance) Sonnet makes, Opus plans and checks, and Fable is kept
+for blast radius 2: prefer `planner` over `architect` at blast radius 0–1.
 
 One-off override without editing the files: the Agent tool's `model` parameter
 beats the frontmatter (e.g. run `builder` with `model: fable` for a part that is

@@ -12,6 +12,7 @@ agents/editor.md
 agents/librarian.md
 agents/monitor.md
 agents/operator.md
+agents/planner.md
 agents/promptsmith.md
 agents/quickfix.md
 agents/researcher.md
