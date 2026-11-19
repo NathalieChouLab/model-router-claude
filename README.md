@@ -75,7 +75,7 @@ PROFILE=cost ./install.sh      # usage-first on any plan
 | operator | opus · high | sonnet · high | sonnet · high |
 | monitor | haiku · low | haiku · low | haiku · low |
 
-**Why the `pro` profile looks like this.** On Claude Pro the session default is Sonnet 5, Opus draws on the same 5-hour usage window, and Fable can bill to usage credits rather than the plan's included limits (see [Claude Code model configuration](https://code.claude.com/docs/en/model-config)). So `pro` keeps the mechanical tiers on Sonnet at high effort, which is where most tokens go, and spends Opus only on the two tiers where judgment is expensive to get wrong: `architect` and `auditor`. The routing rules are identical; only the pins change. If you later buy usage credits or move to Max, re-run with `PROFILE=quality`.
+**Why the `pro` profile looks like this.** On Claude Pro the session default is Sonnet, Opus draws on the same 5-hour usage window, and Fable can bill to usage credits rather than the plan's included limits (see [Claude Code model configuration](https://code.claude.com/docs/en/model-config)). So `pro` keeps the mechanical tiers on Sonnet at high effort, which is where most tokens go, and spends Opus only on the two tiers where judgment is expensive to get wrong: `architect` and `auditor`. The routing rules are identical; only the pins change. If you later buy usage credits or move to Max, re-run with `PROFILE=quality`.
 
 The tables live in `profiles/*.tsv` (agent, model, effort per line) — edit or add your own and install with `PROFILE=<name>`.
 

@@ -1,6 +1,6 @@
 ---
 name: architect
-description: ARCHITECT tier of the model-router. Top model (Fable 5.1) for the decisions that are expensive to get wrong — investigating unfamiliar code to produce a plan, architecture and trade-off decisions, root-causing bugs of unknown cause, anything touching billing/auth/security/data deletion/deploy, and writing specs or briefs that other agents will execute. Produces plans and verdicts, not edits.
+description: ARCHITECT tier of the model-router. Top model (Fable 5.2) for the decisions that are expensive to get wrong — investigating unfamiliar code to produce a plan, architecture and trade-off decisions, root-causing bugs of unknown cause, anything touching billing/auth/security/data deletion/deploy, and writing specs or briefs that other agents will execute. Produces plans and verdicts, not edits.
 model: fable
 effort: high
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch

@@ -28,7 +28,7 @@ Sum → tier:
   logs, renames, formatting, boilerplate, reading docs.
 - **2–4 → BUILDER tier (Opus, high effort).** Implementing an agreed plan, tests, docs,
   refactors covered by tests, UI copy, well-specified features.
-- **5–8 → ARCHITECT tier (Fable 5.1, high effort).** Investigating unfamiliar code to produce
+- **5–8 → ARCHITECT tier (Fable 5.2, high effort).** Investigating unfamiliar code to produce
   a plan, architecture and trade-off decisions, root-causing a bug with unknown
   cause, anything touching billing/auth/security/deletion, writing specs or
   prompts other sessions will execute.
@@ -78,16 +78,16 @@ and each pins its model):
 - `tester` — Opus at high effort, writes and runs tests independently of the builder
 - `writer` — Opus at medium effort, prose from an approved outline
 - `verifier` — Opus, read-only, adversarial
-- `architect` — Fable 5.1, plans and decisions
-- `auditor` — Fable 5.1 at maximum effort, read-only final gate for blast radius 2
+- `architect` — Fable 5.2, plans and decisions
+- `auditor` — Fable 5.2 at maximum effort, read-only final gate for blast radius 2
 - `designer` — Opus, read-only visual/UX review against a standard
 - `debugger` — Opus at high effort, may add temporary instrumentation to find a cause
 - `analyst` — Opus at high effort, numbers computed by shown code
 - `librarian` — Sonnet at medium effort, large-context reader returning cited briefs
 - `coordinator` — Opus, read-only, turns a multi-task request into an ordered queue
-- `promptsmith` — Fable 5.1, read-only, writes briefs/specs/prompts other agents execute
+- `promptsmith` — Fable 5.2, read-only, writes briefs/specs/prompts other agents execute
 - `editor` — Opus at medium effort, read-only prose review against a standard
-- `counsel` — Fable 5.1, read-only legal/regulatory analysis with primary sources
+- `counsel` — Fable 5.2, read-only legal/regulatory analysis with primary sources
 - `operator` — Opus, system administration and ops with read-only diagnosis first
 - `monitor` — Haiku at low effort, read-only log/health/status checks
 - `clerk` — Haiku at low effort, mechanical edits and file housekeeping, no decisions
