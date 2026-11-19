@@ -108,26 +108,26 @@ needs judgment) · operator → `builder` after a `planner` plan · coordinator 
 Each agent file pins **both** a model and an effort level, so switching tier
 switches effort automatically:
 
-| Agent | Rung | Bump within tier by adding to the brief |
+| Agent | Rung | When reasoning is the bottleneck for this part |
 |---|---|---|
 | `scout` | fast | nothing — never bump a scout |
-| `researcher` | mid | "think hard" only when sources conflict |
-| `builder` | mid | "think harder" on concurrency, migrations, edge cases |
-| `tester` | mid | "think harder" for concurrency or security test cases |
-| `writer` | mid | "think hard" for positioning-sensitive copy |
-| `verifier` | strong | "think harder" when the change is subtle |
-| `planner` | strong | "think harder" when the code is unfamiliar |
+| `researcher` | mid | name the conflicting sources in the brief |
+| `builder` | mid | list the edge cases in the brief (concurrency, migrations); "ultrathink" only on a retry after a failed verification |
+| `tester` | mid | list the concurrency or security cases to cover |
+| `writer` | mid | attach the positioning or voice guide |
+| `verifier` | strong | point at the subtle part of the change |
+| `planner` | strong | "ultrathink" when the code is unfamiliar |
 | `architect` | top | "ultrathink" for irreversible / unknown-cause work |
 | `auditor` | top | nothing — its effort is already the highest in the profile; split the change instead |
-| `designer` | strong | "think hard" when the standard is thin |
+| `designer` | strong | write the standard down first |
 | `debugger` | strong | "ultrathink" for intermittent or concurrency bugs |
-| `analyst` | mid | "think harder" for forecasts or multi-step derivations |
+| `analyst` | mid | ask for every derivation step to be shown |
 | `librarian` | mid | nothing — reading is the work |
-| `coordinator` | strong | "think hard" when tasks share files or tiers conflict |
+| `coordinator` | strong | name the shared files or conflicting tiers |
 | `promptsmith` | top | "ultrathink" for prompts that many sessions will run |
 | `editor` | strong | nothing — the standard does the work |
 | `counsel` | top | "ultrathink" for multi-jurisdiction or high-stakes questions |
-| `operator` | strong | "think hard" before any state-changing command |
+| `operator` | strong | require the command list before any state-changing command |
 | `monitor` | fast | nothing — never bump a monitor |
 | `clerk` | fast | nothing — if it needs thought it is not clerk work |
 | `runner` | fast | nothing |
@@ -152,13 +152,20 @@ State the routing in one line before starting, e.g.
 
 ## Step 3b — effort follows the tier
 
-Model picks the ceiling; effort decides how much of it is used. Effort is now
-baked into each agent file (table above), so you normally say nothing. Bump it
-with a keyword only when reasoning is the bottleneck for *that part*:
+Model picks the ceiling; effort decides how much of it is used. Effort is
+baked into each agent file, so you normally say nothing. When reasoning is the
+bottleneck for *that part*, there are two levers, in this order:
 
-- BUILDER on tricky-but-specified work (concurrency, migrations, edge-case tests) → "think harder".
-- ARCHITECT on blast radius 2 or unknown-cause debugging → "ultrathink".
-- SCOUT → never. High effort on lookup work is pure waste.
+1. **A sharper brief.** Name the risk: the edge cases, the conflicting sources,
+   the subtle part of the change (table above). "Think hard" and "think harder"
+   are plain words to current Claude Code, not effort switches.
+2. **The literal word `ultrathink` in the brief.** It is the one thinking
+   keyword Claude Code still recognises and it jumps that request to maximum,
+   so keep it for blast radius 2, unknown-cause debugging, and retries after a
+   failed verification.
+
+- SCOUT and the other fast-rung agents → never. High effort on lookup work is pure waste.
+- If neither lever is enough, go up a rung (Step 4) instead of stacking keywords.
 
 ## Step 4 — re-route at every checkpoint (mid-task switching)
 
@@ -180,7 +187,7 @@ report is the checkpoint that promotes the part.
 - Anyone finds the change touches billing/auth/data/deploy → stop, blast radius 2, ARCHITECT, wait for the human.
 - Scout says "can't tell without reading deeply" → promote that part to BUILDER.
 - Clerk stops on an ambiguity, digest says "promote to librarian", quickfix fails its one attempt → promote that part one tier (BUILDER, LIBRARIAN, BUILDER respectively). Never retry a low-effort tier.
-- Builder fails verification **once** → if the failure is a contained slip, retry BUILDER with "think harder"; if it hints the plan or the cause is off, go straight to PLANNER, or ARCHITECT at blast radius 2. Quality-first means one failure is enough evidence.
+- Builder fails verification **once** → if the failure is a contained slip, retry BUILDER with the failure spelled out in the brief (add "ultrathink" if the slip was a reasoning one); if it hints the plan or the cause is off, go straight to PLANNER, or ARCHITECT at blast radius 2. Quality-first means one failure is enough evidence.
 - Builder fails verification **twice** → ARCHITECT, no exceptions.
 - Verifier flags a BLOCKER it can't explain → ARCHITECT root-causes before anyone patches.
 - Researcher returns UNKNOWN on a fact the plan depends on → ARCHITECT decides how to proceed without it; never let a builder assume.

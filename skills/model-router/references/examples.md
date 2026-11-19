@@ -13,7 +13,7 @@ Routing: `builder → edit pricing.html · scout → grep for other stale "water
 
 ## 3. "Re-wire the RevenueCat offering to the new Stripe prices"
 Blast 2 (billing) → ARCHITECT regardless of how mechanical it looks.
-Routing: `architect(think hard) → exact click-path checklist + what to verify after (STOP; human executes in dashboard)`. Agents never touch billing config autonomously.
+Routing: `architect → exact click-path checklist + what to verify after (STOP; human executes in dashboard)`. Agents never touch billing config autonomously.
 
 ## 4. "Where does the effect engine drive time from?"
 Pure reconnaissance = 0–1 → SCOUT, no extended reasoning.
@@ -29,6 +29,6 @@ Ambiguity 2 · Blast 1 (public positioning) · Novelty 1 · Verification 2 (only
 Initial score: Ambiguity 1 · Blast 1 · Novelty 1 · Verification 1 = 4 → BUILDER.
 - Builder starts, reports the export helper reads from a cached query whose invalidation it can't explain → `Re-route: builder → architect (unknown cache semantics)`. Architect(high) reads the cache layer, writes a two-step plan.
 - Plan approved → `Re-route: architect → builder (plan approved)`. Builder implements step 1; scout in parallel greps for other callers of the cache (low effort).
-- Verifier FAILs on an empty-dataset edge case → builder retried with "think hard about the edge cases" (effort step, same model). Passes.
+- Verifier FAILs on an empty-dataset edge case → builder retried with the failing edge case spelled out in the brief (same model). Passes.
 - Step 2 is a copy change on the page → BUILDER default effort; verifier at default. Done.
 Net: the top model was used for one part of six. Without checkpoints the whole task would either have run on architect (waste) or stayed on builder past the cache bug (rewrite).
