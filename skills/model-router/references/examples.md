@@ -4,7 +4,7 @@ Real tasks, scored and routed. Read this when a classification feels ambiguous.
 
 ## 1. "Fix the export bug — the button does nothing on iPhone"
 Ambiguity 2 (cause unknown) · Blast 1 (one feature, but it's the paid feature → treat as 2 if export is the paywall boundary) · Novelty 2 (unseen codebase) · Verification 1 (device test needed) = 6–7 → ARCHITECT.
-Routing: `architect(ultrathink) → root-cause + plan (STOP) · builder → patch handler · verifier → run probe checks · human → iPhone test`.
+Routing: `debugger → confirmed cause + fix sketch · builder → patch handler · verifier → run probe checks · human → iPhone test`.
 Why not builder-first: six plausible causes existed (codec, gesture, canvas, delivery, throttling, permissions); a mid model picks one and "fixes" it.
 
 ## 2. "Update the pricing page copy: remove watermarked export from the Free card"
@@ -20,7 +20,7 @@ Pure reconnaissance = 0–1 → SCOUT, no extended reasoning.
 Brief: "Grep for performance.now, requestAnimationFrame, animation-duration under src/. Return file:line + one line each. If the time model is unclear from matches alone, say 'needs deeper read' and stop."
 
 ## 5. "Write the marketing plan for launch"
-Ambiguity 2 · Blast 1 (public positioning) · Novelty 1 · Verification 2 (only human judgment) = 6 → ARCHITECT(think hard) for strategy + positioning; BUILDER for deriving per-channel copy from the approved strategy; VERIFIER checks copy against the strategy doc, not against taste.
+Ambiguity 2 · Blast 1 (public positioning) · Novelty 1 · Verification 2 (only human judgment) = 6 → PLANNER for strategy + positioning; BUILDER for deriving per-channel copy from the approved strategy; VERIFIER checks copy against the strategy doc, not against taste.
 
 ## 6. "Add a test for pickBitrate()"
 0 across the board → trivial; skip routing, just write it. The router must never cost more than the work.

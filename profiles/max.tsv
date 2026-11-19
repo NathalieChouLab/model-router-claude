@@ -1,0 +1,11 @@
+fast	haiku	low
+mid	opus	high
+strong	opus	high
+top	fable	high
+scout	sonnet	low
+researcher	sonnet	medium
+librarian	sonnet	medium
+quickfix	sonnet	low
+writer	opus	medium
+editor	opus	medium
+auditor	fable	max

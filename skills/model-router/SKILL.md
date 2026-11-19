@@ -5,11 +5,12 @@ description: Project-agnostic routing of work to the right model tier and effort
 
 # Model router
 
-Goal: **quality first, cost second.** Every tier runs a model strong enough
-that its output rarely needs a retry; the cheaper tiers exist to keep the main
-context clean and the top model focused, not to save money at the risk of a
-wrong cut. Never trade correctness for cost. (To flip back to cost-first, lower
-the pins in `~/.claude/agents/*.md` and raise the thresholds below.)
+Goal: **quality first, on the cheapest rung that delivers it.** Agents sit on
+four rungs — fast, mid, strong, top — and the installed profile decides which
+model and effort each rung gets. Makers sit one rung below their checkers, and
+the top rung is kept for what is expensive to get wrong. The cheaper rungs
+exist to keep the main context clean and the top model focused, not to save
+money at the risk of a wrong cut. Never trade correctness for cost.
 
 ## Step 1 — classify the task (30 seconds, no tools)
 
@@ -24,14 +25,20 @@ Score the task on four axes, 0–2 each:
 
 Sum → tier:
 
-- **0–1 → SCOUT tier (Sonnet, low effort).** Exploration, grep, summarizing
+- **0–1 → SCOUT tier (fast rung).** Exploration, grep, summarizing
   logs, renames, formatting, boilerplate, reading docs.
-- **2–4 → BUILDER tier (Opus, high effort).** Implementing an agreed plan, tests, docs,
+- **2–4 → BUILDER tier (mid rung).** Implementing an agreed plan, tests, docs,
   refactors covered by tests, UI copy, well-specified features.
-- **5–8 → ARCHITECT tier (Fable 5.2, high effort).** Investigating unfamiliar code to produce
+- **5–8 → PLANNER or ARCHITECT tier (strong / top rung).** Investigating unfamiliar code to produce
   a plan, architecture and trade-off decisions, root-causing a bug with unknown
   cause, anything touching billing/auth/security/deletion, writing specs or
   prompts other sessions will execute.
+
+**Planner before architect.** At blast radius 0–1 the plan, the investigation
+and the trade-off go to PLANNER (strong rung). ARCHITECT (top rung) is for blast
+radius 2, irreversible or architecture-level decisions, specs other sessions
+will execute, and parts where the planner already failed. Wherever this file
+says ARCHITECT for a part at blast radius 0–1, read PLANNER first.
 
 **Hard overrides (ignore the score):** blast radius = 2 → ARCHITECT always.
 User says "just do it quickly" on a reversible task → drop one tier.
@@ -73,64 +80,64 @@ one-file fix with known cause and existing check → QUICKFIX (small model; one 
 Use the Agent tool with the matching subagent (they live in `~/.claude/agents/`
 and each pins its model):
 
-- `scout` — read-only, Sonnet at low effort
-- `researcher` — read-only, Sonnet at medium effort, web-enabled, sourced facts
-- `builder` — Opus, edits + runs checks
-- `tester` — Opus at high effort, writes and runs tests independently of the builder
-- `writer` — Opus at medium effort, prose from an approved outline
-- `verifier` — Opus, read-only, adversarial
-- `planner` — Opus, read-only, plans reversible work (blast radius 0–1)
-- `architect` — Fable 5.2, plans and decisions
-- `auditor` — Fable 5.2 at maximum effort, read-only final gate for blast radius 2
-- `designer` — Opus, read-only visual/UX review against a standard
-- `debugger` — Opus at high effort, may add temporary instrumentation to find a cause
-- `analyst` — Opus at high effort, numbers computed by shown code
-- `librarian` — Sonnet at medium effort, large-context reader returning cited briefs
-- `coordinator` — Opus, read-only, turns a multi-task request into an ordered queue
-- `promptsmith` — Fable 5.2, read-only, writes briefs/specs/prompts other agents execute
-- `editor` — Opus at medium effort, read-only prose review against a standard
-- `counsel` — Fable 5.2, read-only legal/regulatory analysis with primary sources
-- `operator` — Opus, system administration and ops with read-only diagnosis first
-- `monitor` — Haiku at low effort, read-only log/health/status checks
-- `clerk` — Haiku at low effort, mechanical edits and file housekeeping, no decisions
-- `runner` — Haiku at low effort, runs the named command and reports pass/fail compactly
-- `digest` — Haiku at low effort, ten-line summary of one item
-- `quickfix` — Sonnet at low effort, one small fix proven by an existing check
+Core pack (always installed):
+
+- `scout` — fast, read-only lookup
+- `runner` — fast, runs the named command and reports pass/fail compactly
+- `quickfix` — mid at low effort, one small fix proven by an existing check
+- `builder` — mid, edits + runs checks
+- `planner` — strong, read-only, plans reversible work (blast radius 0–1)
+- `debugger` — strong, may add temporary instrumentation to find a cause
+- `verifier` — strong, read-only, adversarial
+- `architect` — top, plans and decisions at blast radius 2
+
+Opt-in packs (`PACKS=...` at install):
+
+- **writing** — `writer` (mid), `editor` (strong, never the writer), `researcher` (mid, web, sourced facts), `librarian` (mid, long material → cited brief), `digest` (fast, ten-line summary)
+- **ops** — `operator` (strong, diagnose read-only first), `monitor` (fast, log/health checks), `clerk` (fast, mechanical edits, no decisions)
+- **gate** — `auditor` (top, read-only final gate for blast radius 2), `promptsmith` (top, briefs/specs/prompts others execute), `counsel` (top, legal/regulatory with primary sources)
+- **product** — `designer` (strong, UI review against a standard), `analyst` (mid, numbers by shown code), `tester` (mid, tests independent of the builder), `coordinator` (strong, multi-task request → ordered queue)
+
+**If an agent named in this file is not installed**, check `~/.claude/agents/`
+and route the part to its core stand-in, saying so in the routing line:
+writer, tester, analyst, clerk → `builder` · editor, designer → `verifier` ·
+researcher, librarian, digest, monitor → `scout` (promote to `planner` if it
+needs judgment) · operator → `builder` after a `planner` plan · coordinator →
+`planner` · auditor, promptsmith, counsel → `architect`.
 
 Each agent file pins **both** a model and an effort level, so switching tier
 switches effort automatically:
 
-| Agent | Model | Effort | Bump within tier by adding to the brief |
-|---|---|---|---|
-| `scout` | sonnet | low | nothing — never bump a scout |
-| `researcher` | sonnet | medium | "think hard" only when sources conflict |
-| `builder` | opus | high | "think harder" on concurrency, migrations, edge cases |
-| `tester` | opus | high | "think harder" for concurrency or security test cases |
-| `writer` | opus | medium | "think hard" for positioning-sensitive copy |
-| `verifier` | opus | high | "think harder" when the change is subtle |
-| `planner` | opus | high | "think harder" when the code is unfamiliar |
-| `architect` | fable | high | "ultrathink" for irreversible / unknown-cause work |
-| `auditor` | fable | max | already at maximum — never bump; split the change instead |
-| `designer` | opus | high | "think hard" when the standard is thin |
-| `debugger` | opus | high | "ultrathink" for intermittent or concurrency bugs |
-| `analyst` | opus | high | "think harder" for forecasts or multi-step derivations |
-| `librarian` | sonnet | medium | nothing — reading is the work |
-| `coordinator` | opus | high | "think hard" when tasks share files or tiers conflict |
-| `promptsmith` | fable | high | "ultrathink" for prompts that many sessions will run |
-| `editor` | opus | medium | nothing — the standard does the work |
-| `counsel` | fable | high | "ultrathink" for multi-jurisdiction or high-stakes questions |
-| `operator` | opus | high | "think hard" before any state-changing command |
-| `monitor` | haiku | low | nothing — never bump a monitor |
-| `clerk` | haiku | low | nothing — if it needs thought it is not clerk work |
-| `runner` | haiku | low | nothing |
-| `digest` | haiku | low | nothing — promote to librarian instead |
-| `quickfix` | sonnet | low | nothing — promote to builder instead |
+| Agent | Rung | Bump within tier by adding to the brief |
+|---|---|---|
+| `scout` | fast | nothing — never bump a scout |
+| `researcher` | mid | "think hard" only when sources conflict |
+| `builder` | mid | "think harder" on concurrency, migrations, edge cases |
+| `tester` | mid | "think harder" for concurrency or security test cases |
+| `writer` | mid | "think hard" for positioning-sensitive copy |
+| `verifier` | strong | "think harder" when the change is subtle |
+| `planner` | strong | "think harder" when the code is unfamiliar |
+| `architect` | top | "ultrathink" for irreversible / unknown-cause work |
+| `auditor` | top | nothing — its effort is already the highest in the profile; split the change instead |
+| `designer` | strong | "think hard" when the standard is thin |
+| `debugger` | strong | "ultrathink" for intermittent or concurrency bugs |
+| `analyst` | mid | "think harder" for forecasts or multi-step derivations |
+| `librarian` | mid | nothing — reading is the work |
+| `coordinator` | strong | "think hard" when tasks share files or tiers conflict |
+| `promptsmith` | top | "ultrathink" for prompts that many sessions will run |
+| `editor` | strong | nothing — the standard does the work |
+| `counsel` | top | "ultrathink" for multi-jurisdiction or high-stakes questions |
+| `operator` | strong | "think hard" before any state-changing command |
+| `monitor` | fast | nothing — never bump a monitor |
+| `clerk` | fast | nothing — if it needs thought it is not clerk work |
+| `runner` | fast | nothing |
+| `digest` | fast | nothing — promote to librarian instead |
+| `quickfix` | mid | nothing — promote to builder instead |
 
-The table is the `quality` profile. On Claude Pro install with `PROFILE=pro`
-(Sonnet for the mechanical tiers, Opus for architect and auditor); the routing
-rules below do not change, only the pins. With `PROFILE=fable-lean` (Fable is
-the scarce allowance) Sonnet makes, Opus plans and checks, and Fable is kept
-for blast radius 2: prefer `planner` over `architect` at blast radius 0–1.
+The model and effort behind each rung come from the installed profile
+(`balanced` by default: fast = Haiku low, mid = Sonnet medium, strong = Opus
+medium, top = Fable low; `max`, `pro` and `cost` shift them). The pins are in
+each agent's frontmatter; the routing rules below do not change with the profile.
 
 One-off override without editing the files: the Agent tool's `model` parameter
 beats the frontmatter (e.g. run `builder` with `model: fable` for a part that is
@@ -173,7 +180,7 @@ report is the checkpoint that promotes the part.
 - Anyone finds the change touches billing/auth/data/deploy → stop, blast radius 2, ARCHITECT, wait for the human.
 - Scout says "can't tell without reading deeply" → promote that part to BUILDER.
 - Clerk stops on an ambiguity, digest says "promote to librarian", quickfix fails its one attempt → promote that part one tier (BUILDER, LIBRARIAN, BUILDER respectively). Never retry a low-effort tier.
-- Builder fails verification **once** → if the failure is a contained slip, retry BUILDER with "think harder"; if it hints the plan or the cause is off, go straight to ARCHITECT (Fable). Quality-first means one failure is enough evidence.
+- Builder fails verification **once** → if the failure is a contained slip, retry BUILDER with "think harder"; if it hints the plan or the cause is off, go straight to PLANNER, or ARCHITECT at blast radius 2. Quality-first means one failure is enough evidence.
 - Builder fails verification **twice** → ARCHITECT, no exceptions.
 - Verifier flags a BLOCKER it can't explain → ARCHITECT root-causes before anyone patches.
 - Researcher returns UNKNOWN on a fact the plan depends on → ARCHITECT decides how to proceed without it; never let a builder assume.
@@ -197,7 +204,7 @@ report is the checkpoint that promotes the part.
 **Never shift down:**
 - Inside a part that is still running — finish it at the tier it started on.
 - Below the tier of the code being debugged (a billing bug stays ARCHITECT even for a one-line fix).
-- On anything the user will ship, publish, or send to another person — quality-first means verify with the Opus verifier even when tests pass.
+- On anything the user will ship, publish, or send to another person — quality-first means verify with the verifier even when tests pass.
 - On a part that has already failed once at that tier.
 
 Announce every switch in one line so the trail is auditable:
